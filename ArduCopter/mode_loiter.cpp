@@ -166,6 +166,12 @@ void ModeLoiter::run()
         motors->set_desired_spool_state(AP_Motors::DesiredSpoolState::THROTTLE_UNLIMITED);
 
 #if PRECISION_LANDING == ENABLED
+        //TODO: Will have to do something here to ensure that the precision loiter is entered smoothly
+        //Limit maximum jerk?
+        // _pos_control.set_max_speed_xy(_wp_accel_cmss);
+        // _pos_control.set_max_accel_xy(_wp_accel_cmss);
+        // _pos_control.set_correction_speed_accel_xy(_wp_desired_speed_xy_cms, _wp_accel_cmss);
+
         if (do_precision_loiter()) {
             precision_loiter_xy();
         }

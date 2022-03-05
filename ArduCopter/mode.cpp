@@ -607,6 +607,12 @@ void Mode::land_run_horizontal_control()
     }
 
 #if PRECISION_LANDING == ENABLED
+    //TODO: Switch here to detect first detections
+    //      This would catch all "landing" cases
+        //Limit maximum jerk?
+        // _pos_control.set_max_speed_accel_xy(_wp_desired_speed_xy_cms, _wp_accel_cmss);
+        // _pos_control.set_correction_speed_accel_xy(_wp_desired_speed_xy_cms, _wp_accel_cmss);
+
     bool doing_precision_landing = !copter.ap.land_repo_active && copter.precland.target_acquired();
     // run precision landing
     if (doing_precision_landing) {

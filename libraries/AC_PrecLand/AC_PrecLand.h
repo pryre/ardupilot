@@ -129,7 +129,6 @@ private:
     AP_Float                    _land_ofs_cm_x;     // Desired landing position of the camera forward of the target in vehicle body frame
     AP_Float                    _land_ofs_cm_y;     // Desired landing position of the camera right of the target in vehicle body frame
     AP_Float                    _accel_noise;       // accelerometer process noise
-    AP_Float                    _lag;               // sensor lag in seconds
     AP_Float                    _leash_tune_land;   // fine tune factor for leash correction limit during precision landing
     AP_Float                    _leash_tune_loiter; // fine tune factor for leash correction limit during precision loiter
     AP_Vector3f                 _cam_offset;        // Position of the camera relative to the CG

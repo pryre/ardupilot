@@ -245,6 +245,7 @@ AC_PosControl::AC_PosControl(const AP_AHRS_View& ahrs, const AP_InertialNav& ina
     _flags.reset_rate_to_accel_z = true;
     _flags.freeze_ff_z = true;
     _flags.use_desvel_ff_z = true;
+    _flags.ignore_psc_leash_fine_tune = true;
     _limit.pos_up = true;
     _limit.pos_down = true;
     _limit.vel_up = true;
@@ -1042,6 +1043,15 @@ void AC_PosControl::desired_vel_to_pos(float nav_dt)
     }
 }
 
+///set_leash_length_fine_tune - sets a leash length fine-tuning factor as a gain for a single loop
+///     when update_xy_controller is next called the leash length will be adjusted, and as such
+///     this function should be called in a consistent manner (i.e. avoid one-shot calls)
+void AC_PosControl::set_leash_length_fine_tune(const float fine_tune_factor) {
+    //Make sure that the value is positive or zero
+    _leash_fine_tune = MAX(fine_tune_factor, 0.0f);
+    _flags.ignore_psc_leash_fine_tune = false;
+}
+
 /// run horizontal position controller correcting position and velocity
 ///     converts position (_pos_target) to target velocity (_vel_target)
 ///     desired velocity (_vel_desired) is combined into final target velocity
@@ -1054,6 +1064,9 @@ void AC_PosControl::run_xy_controller(float dt)
 
     Vector3f curr_pos = _inav.get_position();
     float kP = ekfNavVelGainScaler * _p_pos_xy.kP(); // scale gains to compensate for noisy optical flow measurement in the EKF
+    float kL = get_leash_length_fine_tune();
+    clear_leash_length_fine_tune();
+
 
     // avoid divide by zero
     if (kP <= 0.0f) {
@@ -1067,7 +1080,7 @@ void AC_PosControl::run_xy_controller(float dt)
         // Constrain _pos_error and target position
         // Constrain the maximum length of _vel_target to the maximum position correction velocity
         // TODO: replace the leash length with a user definable maximum position correction
-        if (limit_vector_length(_pos_error.x, _pos_error.y, _leash)) {
+        if (limit_vector_length(_pos_error.x, _pos_error.y, kL*_leash)) {
             _pos_target.x = curr_pos.x + _pos_error.x;
             _pos_target.y = curr_pos.y + _pos_error.y;
         }

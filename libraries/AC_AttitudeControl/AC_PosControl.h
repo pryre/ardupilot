@@ -233,6 +233,17 @@ public:
     /// freeze_ff_z - used to stop the feed forward being calculated during a known discontinuity
     void freeze_ff_z() { _flags.freeze_ff_z = true; }
 
+    ///set_leash_length_fine_tune - sets a leash length fine-tuning factor as a gain for a single loop
+    ///     when update_xy_controller is next called the leash length will be adjusted, and as such
+    ///     this function should be called in a consistent manner (i.e. avoid one-shot calls)
+    void set_leash_length_fine_tune(const float fine_tune_factor);
+
+    ///clear_leash_length_fine_tune - clears the length fine-tuning factor
+    void clear_leash_length_fine_tune() { _flags.ignore_psc_leash_fine_tune = true; }
+
+    ///get_leash_length_fine_tune - get the current leash length fine-tuning factor
+    float get_leash_length_fine_tune() { return _flags.ignore_psc_leash_fine_tune ? 1.0f : _leash_fine_tune; }
+
     // is_active_xy - returns true if the xy position controller has been run very recently
     bool is_active_xy() const;
 
@@ -324,6 +335,7 @@ protected:
             uint16_t freeze_ff_z        : 1;    // 1 used to freeze velocity to accel feed forward for one iteration
             uint16_t use_desvel_ff_z    : 1;    // 1 to use z-axis desired velocity as feed forward into velocity step
             uint16_t vehicle_horiz_vel_override : 1; // 1 if we should use _vehicle_horiz_vel as our velocity process variable for one timestep
+            uint16_t ignore_psc_leash_fine_tune : 1;  // 1 if we should ignore the leash fine tuning adjustment
     } _flags;
 
     // limit flags structure
@@ -407,6 +419,7 @@ protected:
     float       _leash_down_z;          // vertical leash down in cm.  target will never be further than this distance below the vehicle
     float       _leash_up_z;            // vertical leash up in cm.  target will never be further than this distance above the vehicle
     float       _vel_z_control_ratio = 2.0f;   // confidence that we have control in the vertical axis
+    float       _leash_fine_tune = 1.0f;    //Fine-tune for leash maximum length 
 
     // output from controller
     float       _roll_target;           // desired roll angle in centi-degrees calculated by position controller

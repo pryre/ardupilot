@@ -621,6 +621,7 @@ void Mode::land_run_horizontal_control()
         }
         pos_control->set_xy_target(target_pos.x, target_pos.y);
         pos_control->override_vehicle_velocity_xy(-target_vel_rel);
+        pos_control->set_leash_length_fine_tune(copter.precland.get_leash_fine_tune_landing());
     }
 #endif
 

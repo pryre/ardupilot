@@ -104,6 +104,20 @@ const AP_Param::GroupInfo AC_PrecLand::var_info[] = {
     // @RebootRequired: True
     AP_GROUPINFO("LAG", 9, AC_PrecLand, _lag, 0.02f), // 20ms is the old default buffer size (8 frames @ 400hz/2.5ms)
 
+    // @Param: AGGR_LAND
+    // @DisplayName: Precision landing agression
+    // @Description: Precision landing agression gain. Values less than 1.0 will cause the aircraft to be less agressive during large initial corrections for precision landing.
+    // @Range: 0.1 1.0
+    // @User: Advanced
+    AP_GROUPINFO("AGGR_LAND",  10, AC_PrecLand, _leash_tune_land, 1.0f),
+
+    // @Param: AGGR_LOIT
+    // @DisplayName: Precision loiter agression
+    // @Description: Precision loiter agression gain. Values less than 1.0 will cause the aircraft to be less agressive during large initial corrections for precision loiter. Set to <=0.0 to use precision landing value.
+    // @Range: 0.0 1.0
+    // @User: Advanced
+    AP_GROUPINFO("AGGR_LOIT",  11, AC_PrecLand, _leash_tune_loiter, 0.0f),
+
     AP_GROUPEND
 };
 
@@ -249,6 +263,17 @@ bool AC_PrecLand::get_target_velocity_relative_cms(Vector2f& ret)
     ret = _target_vel_rel_out_NE*100.0f;
     return true;
 }
+
+
+// returns the parameter value for fine tuning the leash distance during loiter
+float AC_PrecLand::get_leash_fine_tune_loiter() {
+    if(is_zero(_leash_tune_loiter) || (_leash_tune_loiter < 0.0f)){ 
+        return get_leash_fine_tune_landing();
+    }
+    
+    return _leash_tune_loiter;
+}
+
 
 // handle_msg - Process a LANDING_TARGET mavlink message
 void AC_PrecLand::handle_msg(const mavlink_message_t &msg)

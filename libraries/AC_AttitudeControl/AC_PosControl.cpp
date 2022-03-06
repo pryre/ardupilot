@@ -1066,6 +1066,7 @@ void AC_PosControl::run_xy_controller(float dt)
     float kP = ekfNavVelGainScaler * _p_pos_xy.kP(); // scale gains to compensate for noisy optical flow measurement in the EKF
     float kL = get_leash_length_fine_tune();
     clear_leash_length_fine_tune();
+    float leash_length = MAX(kL * _leash, POSCONTROL_LEASH_LENGTH_FINE_TUNE_MIN);
 
 
     // avoid divide by zero
@@ -1080,7 +1081,7 @@ void AC_PosControl::run_xy_controller(float dt)
         // Constrain _pos_error and target position
         // Constrain the maximum length of _vel_target to the maximum position correction velocity
         // TODO: replace the leash length with a user definable maximum position correction
-        if (limit_vector_length(_pos_error.x, _pos_error.y, kL*_leash)) {
+        if (limit_vector_length(_pos_error.x, _pos_error.y, leash_length)) {
             _pos_target.x = curr_pos.x + _pos_error.x;
             _pos_target.y = curr_pos.y + _pos_error.y;
         }

@@ -107,7 +107,7 @@ const AP_Param::GroupInfo AC_PrecLand::var_info[] = {
     // @Param: AGGR_LAND
     // @DisplayName: Precision landing agression
     // @Description: Precision landing agression gain. Values less than 1.0 will cause the aircraft to be less agressive during large initial corrections for precision landing.
-    // @Range: 0.05 1.0
+    // @Range: 0.1 1.0
     // @User: Advanced
     AP_GROUPINFO("AGGR_LAND",  10, AC_PrecLand, _leash_tune_land, 1.0f),
 
